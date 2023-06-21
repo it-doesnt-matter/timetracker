@@ -1,0 +1,87 @@
+[project]
+name = "timetracker"
+version = "0.1.0"
+description = "A simple terminal app to keep track of what you spend your time on."
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [{name = "id_doesnt_matter"}]
+maintainers = [{name = "id_doesnt_matter"}]
+dependencies = [
+	"peewee==3.16.2",
+	"rich==13.4.1",
+	"textual==0.27.0",
+	"tzdata==2023.3"
+]
+
+[project.urls]
+repository = "https://github.com/it-doesnt-matter/timetracker.git"
+
+[project.scripts]
+timet = "timetracker.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 99
+
+select = ["ALL"]
+
+ignore = [
+    "ANN101",  # Missing type annotation for `self` in method
+    "D",  # pydocstyle
+    "DTZ001",  # The use of `datetime.datetime()` without `tzinfo` argument is not allowed
+    "DTZ003",  # The use of `datetime.datetime.utcnow()` is not allowed, use `datetime.datetime.now(tz=)` instead
+    "DTZ005",  # The use of `datetime.datetime.now()` without `tz` argument is not allowed
+    "T201",  # `print` found
+    "UP007",  # Use `X | Y` for type annotations
+    "COM812", # Trailing comma missing
+    "FBT001",  # Boolean positional arg in function definition
+    "FBT003",  # Boolean positional value in function call
+    "RET",  # flake8-return
+]
+
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+target-version = "py311"
+
+[tool.ruff.per-file-ignores]
+"src/timetracker/parsers.py" = [
+    "C901",  # `parse_date_range` is too complex (12 > 10)
+    "PLR0912",  # Too many branches (16 > 12)
+    "PLR2004",  # Magic value used in comparison, consider replacing ... with a constant variable
+]
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.isort]
+line_length = 99
+profile = "black"
+
+[tool.black]
+line-length = 99
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
