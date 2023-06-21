@@ -1,17 +1,17 @@
 # TimeTracker
 A simple terminal app to keep track of what you spend your time on.  
-Before you start using this tool, you should set your timezone with the [settings](#settings) command.
 
 ## Table of Contents
 - [Installation](#installation)
 - [Commands](#commands)
-- [Settings](#settings)
+- [Available Settings](#available-settings)
 
 ## Installation
 It's recommended to use [pipx](https://github.com/pypa/pipx) instead of pip to install this application, as pipx makes the app available globally without polluting the global environment and causing conflicts with other packages.
 ```
 pipx install git+https://github.com/it-doesnt-matter/timetracker.git
 ```
+Before you start using this tool, you should also set your timezone with the [settings](#settings) command.
 
 ## Commands
 The commands in this section are documented using the [docopt](http://docopt.org/) language.
@@ -82,7 +82,7 @@ Then <specifier> will indicate, which task/project you want to edit. In the case
 timet edit [task | project] <specifier> <attribute> <value>
 ```
 
-## Settings
+## Available Settings
 ### tz
 Your timezone, which should be specified using an identifier form the [tzdata](https://tzdata.readthedocs.io/en/latest/) package, e.g. "America/New_York" or "CET".
 
