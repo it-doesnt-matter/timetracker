@@ -6,7 +6,7 @@ from argparse import Namespace
 from collections.abc import Iterable
 from datetime import datetime, timedelta
 from importlib.resources import files
-from importlib.resources.abc import Traversable
+from importlib.abc import Traversable
 from pathlib import Path
 from typing import Optional
 from zoneinfo import ZoneInfo
