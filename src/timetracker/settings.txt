@@ -1,3 +1,0 @@
-tz = UTC
-status = basic
-sections = none

@@ -1,0 +1,43 @@
+{
+  "tz": "UTC",
+  "status": "basic",
+  "sections": "none",
+  "show_total": false,
+  "recap_layout": [
+    {
+      "attribute": "project",
+      "header_name": "PROJECT",
+      "options": {}
+    },
+    {
+      "attribute": "task",
+      "header_name": "TASK",
+      "options": {}
+    },
+    {
+      "attribute": "note",
+      "header_name": "NOTE",
+      "options": {}
+    },
+    {
+      "attribute": "start",
+      "header_name": "START",
+      "options": {}
+    },
+    {
+      "attribute": "end",
+      "header_name": "END",
+      "options": {}
+    },
+    {
+      "attribute": "target",
+      "header_name": "TARGET",
+      "options": {}
+    },
+    {
+      "attribute": "duration",
+      "header_name": "DURATION",
+      "options": {}
+    }
+  ]
+}

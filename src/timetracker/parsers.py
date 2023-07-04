@@ -1,28 +1,11 @@
 import re
+import sys
 from calendar import monthrange
 from datetime import datetime, timedelta
 from typing import Optional
-from zoneinfo import ZoneInfo
 
-
-# "dt" is expected to be a naive datetime
-def to_aware_string(dt: datetime, tz: ZoneInfo) -> str:
-    utc_dt = dt.replace(tzinfo=ZoneInfo("UTC"))
-    adjusted_dt = utc_dt.astimezone(tz)
-    return adjusted_dt.strftime("%d/%m/%Y %H:%M:%S")
-
-
-def handle_two_digit_year(year: str) -> str:
-    if len(year) == 2:
-        current_year = datetime.now().year % 100
-        if int(year) >= current_year:
-            return "20" + year
-        else:
-            return "19" + year
-    elif len(year) == 4:
-        return year
-    else:
-        raise ValueError
+from .error_utils import print_error_box
+from .time_utils import handle_two_digit_year
 
 
 def parse_date(dt: str) -> datetime:
@@ -32,14 +15,22 @@ def parse_date(dt: str) -> datetime:
         year = handle_two_digit_year(year)
         try:
             date = datetime(int(year), int(month), int(day))
-        except ValueError:
-            print(f"{dt} is not a valid format for a date")
+        except ValueError as e:
+            print_error_box(e, "Invalid date")
+            sys.exit(1)
         return date
     elif dt.lower() == "today":
         return datetime.now()
     elif dt.lower() == "yesterday":
         return datetime.now() - timedelta(days=1)
-    raise ValueError
+    print_error_box(
+        (
+            "a date must have the following format: dd/mm/yyyy\n"
+            'alternatively the keywords "today" and "yesterday" are also allowed'
+        ),
+        "Invalid date!"
+    )
+    sys.exit(1)
 
 
 def parse_date_range(start_input: str, end_input: Optional[str]) -> tuple[datetime, datetime]:
@@ -48,12 +39,15 @@ def parse_date_range(start_input: str, end_input: Optional[str]) -> tuple[dateti
 
         if start_input == "this":
             start_dt = today - timedelta(days=today.weekday())
-            end_dt = today + timedelta(days=6-today.weekday())
+            end_dt = today + timedelta(days=6 - today.weekday())
         elif start_input == "last":
             start_dt = today - timedelta(weeks=1, days=today.weekday())
-            end_dt = today - timedelta(days=1+today.weekday())
+            end_dt = today - timedelta(days=1 + today.weekday())
         else:
-            raise ValueError
+            print_error_box(
+                'did you perhaps mean "this week" or "last week"?', "Invalid date range!"
+            )
+            sys.exit(1)
     elif end_input == "month":
         year = datetime.now().year
 
@@ -67,10 +61,13 @@ def parse_date_range(start_input: str, end_input: Optional[str]) -> tuple[dateti
             else:
                 month -= 1
         else:
-            raise ValueError
+            print_error_box(
+                'did you perhaps mean "this month" or "last month"?', "Invalid date range!"
+            )
+            sys.exit(1)
 
         start_dt = datetime(year, month, 1)
-        day = monthrange(year, month)
+        _, day = monthrange(year, month)
         end_dt = datetime(year, month, day)
     elif end_input == "year":
         if start_input == "this":
@@ -78,7 +75,10 @@ def parse_date_range(start_input: str, end_input: Optional[str]) -> tuple[dateti
         elif start_input == "last":
             year = datetime.now().year - 1
         else:
-            raise ValueError
+            print_error_box(
+                'did you perhaps mean "this year" or "last year"?', "Invalid date range!"
+            )
+            sys.exit(1)
 
         start_dt = datetime(year, 1, 1)
         end_dt = datetime(year, 12, 31)
