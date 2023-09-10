@@ -6,14 +6,26 @@ from pydantic import Field, FieldValidationInfo, field_serializer, field_validat
 
 
 class BaseModel(PydanticBaseModel):
-    class Config:
-        arbitrary_types_allowed = True
-        extra = "forbid"
-        validate_assignment = True
+    model_config = {
+        "arbitrary_types_allowed": True,
+        "extra": "forbid",
+        "validate_assignment": True,
+    }
 
 
 class Column(BaseModel):
-    attribute: Literal["project", "task", "note", "start", "end", "target", "duration", "id"]
+    attribute: Literal[
+        "project",
+        "task",
+        "note",
+        "start",
+        "end",
+        "target",
+        "duration",
+        "id",
+        "task_tags",
+        "project_tags",
+    ]
     header_name: str | None = Field(default=None, validate_default=True)
     options: dict[str, str] = {}
 

@@ -66,11 +66,9 @@ def format_seconds(total_seconds: float) -> str:
 
 
 # "dt" is expected to be a naive datetime
-def to_aware_string(
-    dt: datetime | None, tz: ZoneInfo, template: str = "%d/%m/%Y %H:%M:%S"
-) -> str | None:
+def to_aware_string(dt: datetime | None, tz: ZoneInfo, template: str = "%d/%m/%Y %H:%M:%S") -> str:
     if dt is None:
-        return None
+        return "N/A"
     utc_dt = dt.replace(tzinfo=ZoneInfo("UTC"))
     adjusted_dt = utc_dt.astimezone(tz)
     return adjusted_dt.strftime(template)

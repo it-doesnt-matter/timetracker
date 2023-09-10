@@ -1,5 +1,4 @@
 import re
-import sys
 from calendar import monthrange
 from datetime import datetime, timedelta
 from typing import Optional
@@ -8,7 +7,7 @@ from .error_utils import print_error_box
 from .time_utils import handle_two_digit_year
 
 
-def parse_date(dt: str) -> datetime:
+def parse_date(dt: str) -> datetime | None:
     pattern = re.compile(r"(?P<day>\d{1,2})\/(?P<month>\d{1,2})\/(?P<year>(?:\d{2}){1,2})")
     if match := pattern.fullmatch(dt):
         day, month, year = match.group("day", "month", "year")
@@ -16,21 +15,17 @@ def parse_date(dt: str) -> datetime:
         try:
             date = datetime(int(year), int(month), int(day))
         except ValueError as e:
-            print_error_box(e, "Invalid date")
-            sys.exit(1)
+            print_error_box("Invalid date")
         return date
     elif dt.lower() == "today":
         return datetime.now()
     elif dt.lower() == "yesterday":
         return datetime.now() - timedelta(days=1)
     print_error_box(
-        (
-            "a date must have the following format: dd/mm/yyyy\n"
-            'alternatively the keywords "today" and "yesterday" are also allowed'
-        ),
-        "Invalid date!"
+        "Invalid date!\n"
+        "a date must have the following format: dd/mm/yyyy\n"
+        'alternatively the keywords "today" and "yesterday" are also allowed'
     )
-    sys.exit(1)
 
 
 def parse_date_range(start_input: str, end_input: Optional[str]) -> tuple[datetime, datetime]:
@@ -45,9 +40,8 @@ def parse_date_range(start_input: str, end_input: Optional[str]) -> tuple[dateti
             end_dt = today - timedelta(days=1 + today.weekday())
         else:
             print_error_box(
-                'did you perhaps mean "this week" or "last week"?', "Invalid date range!"
+                'Invalid date range!\ndid you perhaps mean "this week" or "last week"?'
             )
-            sys.exit(1)
     elif end_input == "month":
         year = datetime.now().year
 
@@ -62,9 +56,8 @@ def parse_date_range(start_input: str, end_input: Optional[str]) -> tuple[dateti
                 month -= 1
         else:
             print_error_box(
-                'did you perhaps mean "this month" or "last month"?', "Invalid date range!"
+                'Invalid date range!\ndid you perhaps mean "this month" or "last month"?'
             )
-            sys.exit(1)
 
         start_dt = datetime(year, month, 1)
         _, day = monthrange(year, month)
@@ -76,9 +69,8 @@ def parse_date_range(start_input: str, end_input: Optional[str]) -> tuple[dateti
             year = datetime.now().year - 1
         else:
             print_error_box(
-                'did you perhaps mean "this year" or "last year"?', "Invalid date range!"
+                'Invalid date range!\ndid you perhaps mean "this year" or "last year"?'
             )
-            sys.exit(1)
 
         start_dt = datetime(year, 1, 1)
         end_dt = datetime(year, 12, 31)

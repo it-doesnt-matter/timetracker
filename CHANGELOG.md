@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0] - 2023-09-10
+
+### Added
+
+- add tags for tasks and projects
+- add `start` and `end` attribute to projects
+- add command to list all projects
+- add command to complete a project, i.e. set `end` attribute of the project
+
+### Fixed
+
+- fix multiple small bugs
+
 ## [0.2.0] - 2023-07-04
 
 ### Added

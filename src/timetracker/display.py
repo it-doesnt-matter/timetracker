@@ -1,10 +1,11 @@
-import sys
 from collections.abc import Sequence
 from datetime import datetime, timedelta
 from time import sleep
 from zoneinfo import ZoneInfo
 
+from peewee import ModelSelect
 from rich import box
+from rich.console import Console
 from rich.live import Live
 from rich.table import Table
 from textual.app import App, ComposeResult
@@ -19,15 +20,29 @@ from .time_utils import format_seconds, get_time_as_ascii_string, to_aware_strin
 
 def display_status(type_: str, task: Task, tz: ZoneInfo) -> None:
     match type_:
-        case ("basic" | "b"):
+        case "basic" | "b":
             display_updating_time(task)
-        case ("table" | "t"):
+        case "table" | "t":
             display_status_table(task, tz)
-        case ("fullscreen" | "f"):
+        case "fullscreen" | "f":
             app = StatusDisplay(task)
             app.run()
+        case "raw" | "r":
+            display_raw_time(task)
         case _:
             raise ValueError
+
+
+def display_raw_time(task: Task) -> None:
+    print(f"{task.project.name} > {task.name}")
+    # this is to avoid rounding errors
+    start = task.start.replace(microsecond=0)
+    target = None if task.target is None else task.target.replace(microsecond=0)
+    if target is None:
+        message = get_status_message_without_target(start)
+    else:
+        message = get_status_message_with_target(start, target)
+    print(message)
 
 
 def display_updating_time(task: Task) -> None:
@@ -46,7 +61,7 @@ def display_updating_time(task: Task) -> None:
             sleep(0.25)
         except KeyboardInterrupt:
             print(message)
-            sys.exit(0)
+            raise SystemExit(0) from None
 
 
 def get_status_message_without_target(start: datetime) -> str:
@@ -71,8 +86,53 @@ def get_status_message_with_target(start: datetime, target: datetime) -> str:
     return message
 
 
-def display_status_table(task: Task, tz: ZoneInfo) -> None:
+def display_project_list(raw: bool, projects: ModelSelect, all_: bool, tz: ZoneInfo) -> None:
+    if raw:
+        display_raw_project_list(projects, all_, tz)
+    else:
+        display_project_list_as_table(projects, all_, tz)
 
+
+def display_project_list_as_table(projects: ModelSelect, include_finished: bool, tz: ZoneInfo
+) -> None:
+    table = Table("Project", "Tags", "Started", show_lines=True, box=box.ROUNDED)
+
+    if include_finished:
+        table.add_column("Finished")
+        for project in projects.dicts().execute():
+            table.add_row(
+                project["name"],
+                project["tags"],
+                to_aware_string(project["start"], tz, "%d/%m/%Y %H:%M:%S"),
+                to_aware_string(project["end"], tz, "%d/%m/%Y %H:%M:%S"),
+            )
+    else:
+        for project in projects.dicts().execute():
+            table.add_row(
+                project["name"],
+                project["tags"],
+                to_aware_string(project["start"], tz, "%d/%m/%Y %H:%M:%S"),
+            )
+
+    console = Console()
+    console.print(table)
+
+
+def display_raw_project_list(projects: ModelSelect, include_finished: bool, tz: ZoneInfo) -> None:
+    if include_finished:
+        print("Project | Tags | Started | Finished")
+    else:
+        print("Project | Tags | Started")
+    for project in projects.dicts().execute():
+        message = f"{project['name']}"
+        message += f" | {project['tags']}"
+        message += f" | {to_aware_string(project['start'], tz, '%d/%m/%Y %H:%M:%S')}"
+        if include_finished:
+            message += f" | {to_aware_string(project['end'], tz, '%d/%m/%Y %H:%M:%S')}"
+        print(message)
+
+
+def display_status_table(task: Task, tz: ZoneInfo) -> None:
     def generate_status_table() -> Table:
         now = datetime.utcnow()
         start_delta = now - task.start
@@ -102,8 +162,7 @@ def display_status_table(task: Task, tz: ZoneInfo) -> None:
             try:
                 sleep(0.2)
             except KeyboardInterrupt:
-                print(generate_status_table())
-                sys.exit(0)
+                raise SystemExit(0) from None
 
 
 class StatusDisplay(App):
@@ -157,10 +216,11 @@ class RecapDisplay(App):
         Binding("k", "scroll( -10)", "Scroll Up", priority=True),
     ]
 
-    def __init__(self, tasks: Sequence[Task], settings: Settings) -> None:
+    def __init__(self, tasks: Sequence[Task], settings: Settings, id_: bool) -> None:
         super().__init__()
         self.tasks = tasks
         self.settings = settings
+        self.id_ = id_
 
     def action_scroll(self, y: int) -> None:
         self.screen.scroll_relative(0, y)
@@ -168,6 +228,8 @@ class RecapDisplay(App):
     def compose(self) -> ComposeResult:
         table = Table(expand=True, row_styles=["white on grey19", "white"], box=box.ROUNDED)
 
+        if self.id_:
+            table.add_column("ID")
         for column in self.settings.recap_layout:
             table.add_column(column.header_name)
 
@@ -179,6 +241,8 @@ class RecapDisplay(App):
             previous_task_start = task.start
 
             args = []
+            if self.id_:
+                args.append(str(task.id))
             for column in self.settings.recap_layout:
                 if column.attribute == "project":
                     args.append(task.project.name)
@@ -201,6 +265,10 @@ class RecapDisplay(App):
                     args.append(format_seconds(delta.total_seconds()))
                 elif column.attribute == "id":
                     args.append(str(task.id))
+                elif column.attribute == "task_tags":
+                    args.append(task.task_tags)
+                elif column.attribute == "project_tags":
+                    args.append(task.project_tags)
 
             table.add_row(*args)
 

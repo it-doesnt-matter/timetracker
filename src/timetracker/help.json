@@ -1,0 +1,90 @@
+{
+	"entry": {
+		"help": "entry callback",
+		"parameters": {
+			"db_file": "name of alternative database file to use"
+		}
+	},
+	"create": {
+		"help": "create a new project",
+		"parameters": {
+			"project_name": "name of the new project",
+			"tags_as_str": "list of comma-seperated tags"
+		}
+	},
+	"complete": {
+		"help": "mark a project as completed",
+		"parameters": {
+			"project_name": "name of the project that sould be deleted"
+		}
+	},
+	"delete": {
+		"help": "delete a project",
+		"parameters": {
+			"project_name": "name of the project that sould be deleted",
+			"yes": "skip all confirmation prompts"
+		}
+	},
+	"list_projects": {
+		"help": "list all projects",
+		"parameters": {
+			"all_": "also include completed projects",
+			"raw": "..."
+		}
+	},
+	"start": {
+		"help": "start a new task",
+		"parameters": {
+			"task_name": "name of the task that sould be started",
+			"project_name": "name of the project in which the task should be started",
+			"note": "optional note to the task",
+			"tags_as_str": "list of comma-seperated tags",
+			"until": "until what time you intend to do the task",
+			"for_": "for how long do you intend to do the task"
+		}
+	},
+	"status": {
+		"help": "show information abut the currently running task",
+		"parameters": {
+			"display": "type of display that should be used; if this is not specified, it falls back to the settings"
+		}
+	},
+	"stop": {
+		"help": "stop the currently running task",
+		"parameters": {}
+	},
+	"recap": {
+		"help": "show a recap",
+		"parameters": {
+			"start_input": "start date of the recap; if this is ommited, all tasks are included",
+			"end_input": "end date of the recap; if this is ommitted, the same date as for start is assumed",
+			"project_name": "restrict the recap to tasks of a certain project",
+			"id_": "show the IDs of the tasks",
+			"tags_as_str": "list of comma-seperated tags for either tasks or projects",
+			"task_tags_as_str": "list of comma-seperated tags for tasks",
+			"project_tags_as_str": "list of comma-seperated tags for projects"
+		}
+	},
+	"export": {
+		"help": "export all the tasks to a csv or json file",
+		"parameters": {
+			"file_type": "choose between json and csv as output format"
+		}
+	},
+	"set_settings": {
+		"help": "change/list settings",
+		"parameters": {
+			"set_": "name and new value of the setting that should be changed",
+			"list_": "list the current settings"
+		}
+	},
+	"edit": {
+		"help": "edit an existing task/project",
+		"parameters": {
+			"table_type": "should a task or project be modified",
+			"specifier": "ID of the task/name of the project that should be changed",
+			"attribute": "attribute that should be changed",
+			"value": "the new value of the attribute"
+		}
+	}
+}

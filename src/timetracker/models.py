@@ -1,10 +1,11 @@
+from datetime import datetime
 from importlib.resources import files
 
-from peewee import CharField, DateTimeField, ForeignKeyField, Model, SqliteDatabase
+from peewee import CharField, CompositeKey, DateTimeField, ForeignKeyField, Model, SqliteDatabase
 from rich.prompt import Confirm
 
 DB_FILE = files("timetracker").joinpath("timetracker.db")
-db = SqliteDatabase(DB_FILE, pragmas={"foreign_keys": 1})
+db = SqliteDatabase(None, pragmas={"foreign_keys": 1})
 
 
 class BaseModel(Model):
@@ -15,6 +16,8 @@ class BaseModel(Model):
 
 class Project(BaseModel):
     name = CharField(unique=True)
+    start = DateTimeField()
+    end = DateTimeField(null=True)
 
 
 class Task(BaseModel):
@@ -26,7 +29,27 @@ class Task(BaseModel):
     project = ForeignKeyField(Project, backref="tasks")
 
 
-MODELS = [Project, Task]
+class Tag(BaseModel):
+    name = CharField(unique=True)
+
+
+class TaskToTag(BaseModel):
+    task = ForeignKeyField(Task)
+    tag = ForeignKeyField(Tag)
+
+    class Meta:
+        primary_key = CompositeKey("task", "tag")
+
+
+class ProjectToTag(BaseModel):
+    project = ForeignKeyField(Project)
+    tag = ForeignKeyField(Tag)
+
+    class Meta:
+        primary_key = CompositeKey("project", "tag")
+
+
+MODELS = [Project, Task, Tag, TaskToTag, ProjectToTag]
 
 
 def init_database() -> None:
@@ -40,9 +63,10 @@ def init_database() -> None:
     with DB_FILE.open("w"):
         pass
 
+    db.init(DB_FILE, pragmas={"foreign_keys": 1})
     with db:
         db.create_tables(MODELS)
-        Project.create(name="Default")
+        Project.create(name="Default", start=datetime.utcnow())
 
 
 if __name__ == "__main__":

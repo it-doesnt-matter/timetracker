@@ -1,6 +1,6 @@
 {
   "tz": "UTC",
-  "status": "basic",
+  "status": "table",
   "sections": "none",
   "show_total": false,
   "recap_layout": [
@@ -37,6 +37,16 @@
     {
       "attribute": "duration",
       "header_name": "DURATION",
+      "options": {}
+    },
+    {
+      "attribute": "task_tags",
+      "header_name": "TASK TAGS",
+      "options": {}
+    },
+    {
+      "attribute": "project_tags",
+      "header_name": "PROJECT TAGS",
       "options": {}
     }
   ]

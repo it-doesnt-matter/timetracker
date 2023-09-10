@@ -1,23 +1,26 @@
 [project]
 name = "timetracker"
-version = "0.2.0"
+version = "0.3.0"
 description = "A simple terminal app to keep track of what you spend your time on."
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [{name = "id_doesnt_matter"}]
 maintainers = [{name = "id_doesnt_matter"}]
 dependencies = [
+    "freezegun==1.2.2",
 	"peewee==3.16.2",
+ 	"pydantic==2.0",
 	"rich==13.4.1",
 	"textual==0.27.0",
-	"tzdata==2023.3"
+    "typer==0.9.0",
+    "tzdata==2023.3"
 ]
 
 [project.urls]
 repository = "https://github.com/it-doesnt-matter/timetracker.git"
 
 [project.scripts]
-timet = "timetracker.main:main"
+timet = "timetracker.main:app"
 
 [build-system]
 requires = ["hatchling"]
@@ -40,6 +43,9 @@ ignore = [
     "FBT001",  # Boolean positional arg in function definition
     "FBT003",  # Boolean positional value in function call
     "RET",  # flake8-return
+    "TD002",  # Invalid TODO capitalization: `todo` should be `TODO`
+    "TD003",  # Missing author in TODO; try: `# TODO(<author_name>): ...`
+    "TD006",  # Missing issue link on the line following this TODO
 ]
 
 exclude = [
@@ -67,8 +73,12 @@ exclude = [
 target-version = "py311"
 
 [tool.ruff.per-file-ignores]
-"src/timetracker/main.py" = [
-	"E501",  # Line too long
+"src/timetracker/commands.py" = [
+    "C901",  # `recap` is too complex
+    "PLR0912",  # Too many branches
+    "TRY301",  # Abstract `raise` to an inner function
+    "FBT002",  # Boolean default value in function definition
+    "PLR0913",  # Too many arguments to function call
 ]
 "src/timetracker/settings.py" = [
 	"N805",  # First argument of a method should be named `self`
@@ -85,6 +95,10 @@ target-version = "py311"
 "src/timetracker/time_utils.py" = [
 	"PLR2004",  # Magic value used in comparison
 ]
+"tests/*.py" = [
+    "S101",  # Use of `assert` detected
+    "PLR2004",  # Magic value used in comparison, consider replacing it with a constant variable
+]
 
 [tool.ruff.mccabe]
 max-complexity = 10
@@ -98,6 +112,8 @@ line-length = 99
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = [
-    "db_type"
-]
+markers = ["db_type"]
+
+[tool.pyright]
+venvPath = "."
+venv = "venv"

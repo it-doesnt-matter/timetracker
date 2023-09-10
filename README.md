@@ -18,29 +18,39 @@ The commands in this section are documented using the [docopt](http://docopt.org
 Each option has a short version using a single hyphen and the first letter of the option. The short version of "--display" is for example "-d".
 
 ### create
-Use this to create a new project. Projects allow us to group related tasks together.
+Use this to create a new project. Projects allow us to group related tasks together.  
+The tags option allows you to add tags to the project. Those can then be used as filters in other commands. Multiple tags should be separated by commas.
 ```
-timet create <project>
+timet create <project> [--tags <tags>]
+```
+
+### complete
+This command can be used to mark a project as completed.
+```
+timet complete <project>
 ```
 
 ### delete
 With this command you can delete projects that are no longer needed. This will also delete all associated tasks.
+The --yes flag can be used to skip all confirmation prompts.
 ```
 timet delete <project>
+```
+
+### list
+Use this command to list all projects.  
+By default completed projects are hidden. To also list completed projects, use the all option.
+```
+timet list [--all]
 ```
 
 ### start
 To start tracking your time, you can use this command. The task doesn't need to be unique, while the project must have been created previously with the [create](#create) command.  
 You can use the note option to add additional information abou the task.  
+The tags option allows you to add tags to the task. Those can then be used as filters in other commands. Multiple tags should be separated by commas.  
 The until and for option can be used to set a target, which represents the estimated end of the task. With "--until" you can set the target directly, while "--for" takes the difference between now and the target. Time uses the HH:MM format.
 ```
-timet start <task> <project> [--note <note>] [--until <time> | --for <time>]
-```
-
-### stop
-This command will stop tracking time.
-```
-timet stop
+timet start <task> <project> [--note <note>] [--tags <tags>] [--until <time> | --for <time>]
 ```
 
 ### status
@@ -50,13 +60,20 @@ The display option allows you to choose between two kinds of displays. The basic
 timet status [--display basic | table | fullscreen]
 ```
 
+### stop
+If there's currently a task running, this command will stop it.
+```
+timet stop
+```
+
 ### recap
 This command will display an overview of finished tasks.  
 Start and end represent dates in the form of dd/mm/yy or dd/mm/yyyy. The recap will only include tasks that occurred during the date range described by start and end. Each of those two arguments might also be substituted with "today" or "yesterday", which will be parsed to the current date or the date of yesterday respectively. If the end is not specified, only tasks that occurred during start are included. If neither start nor end are used, the tasks are not filtered by time. Lastly you can also use any combination of "last"|"this" and "week"|"month"|"year". What those combinations do should be self-explanatory.  
 If you want only tasks of a certain project to be included, you can use "--project" followed by the name of the respective project.  
+The tags option can be used to filter the tasks based on their and their project's tags. If only the task's or the project's tags should be used as filter, the task_tags and the project_tags option can be used respectively.
 When using the id flag, the table will also included the task IDs.
 ```
-timet recap [<start>] [<end>] [--project <project>] [--sections none | days | weeks | months] [--id]
+timet recap [<start>] [<end>] [--project <project>] [--tags <tags>] [--task_tags <task_tags>] [--project_tags <project_tags>] [--id]
 ```
 
 ### export
@@ -103,7 +120,7 @@ Default: "false"
 
 ### recap_layout
 This setting allows you to specify which columns should be included in the recap table. It is a list of objects, where each object represents a column. Such an object has three fields: The attribute field specifies what kind of information the column represents, the header_name sets the header of the column and the options field allows us to include type specific details.
-The possible attributes are "project", "task", "note", "start", "end", "target", "duration" and "id". Currently the only available option is the format option, which is available for "start", "end" and "target". It allows to specify how the datetime should be displayed. The default format looks like this: %d/%m/%Y %H:%M:%S. A basic setup could look like this:
+The possible attributes are "project", "task", "note", "start", "end", "target", "duration", "id", "task_tags" and "project_tags". Currently the only available option is the format option, which is available for "start", "end" and "target". It allows to specify how the datetime should be displayed. The default format looks like this: %d/%m/%Y %H:%M:%S. A basic setup could look like this:
 ```
 [
   {
